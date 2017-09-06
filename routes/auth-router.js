@@ -100,4 +100,18 @@ router.get('/logout', (req, res, next) => {
 });
 
 
+// link to "/auth/facebook" to take the user to the Facebook Website for login
+router.get('/auth/facebook', passport.authenticate('facebook'));
+// the "/auth/facebook/callback" URL is where the user will arrive after login
+router.get('/auth/facebook/callback',
+            // name of strategy    settings object
+            //               |      |
+  passport.authenticate('facebook', {
+      successRedirect: '/',
+      failureRedirect: '/login',
+      failureFlash: true
+  })
+);
+
+
 module.exports = router;

@@ -11,10 +11,14 @@ const userSchema = new Schema(
       required: true
     },
 
-    encryptedPassword: {
-      type: String,
-      required: true
-    }
+    // for users who did normal login with email and password
+    encryptedPassword: { type: String },
+
+    // for Facebook login users
+    facebookID: { type: String },
+
+    // for Google login users
+    googleID: { type: String }
   },
 
   // optional settings object for this schema

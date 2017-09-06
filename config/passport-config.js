@@ -100,3 +100,62 @@ passport.use(
     }
   ) // close new LocalStrategy( ...
 );
+
+
+
+const FbStrategy = require('passport-facebook').Strategy;
+
+// "passport.use()" sets up a new strategy
+passport.use(
+  new FbStrategy(
+    // 1st arg -> settings object
+    {
+        // clientID = App ID
+        clientID: 'facebook app id',
+        // clientSecret = App Secret
+        clientSecret: 'facebook app secret',
+        callbackURL: '/auth/facebook/callback'
+    },
+
+    // 2nd arg -> callback
+    // gets called after a SUCCESSFUL Facebook login
+    (accessToken, refreshToken, profile, done) => {
+        console.log('Facebook user info:');
+        console.log(profile);
+
+        // check to see if it's the first time they log in
+        UserModel.findOne(
+          { facebookID: profile.id },
+
+          (err, userFromDb) => {
+              if (err) {
+                  done(err);
+                  return;
+              }
+
+              // if the user already has an account, GREAT! log them in.
+              if (userFromDb) {
+                  done(null, userFromDb);
+                  return;
+              }
+
+              // if they don't have an account, make one for them.
+              const theUser = new UserModel({
+                  facebookID: profile.id,
+                  email: profile.displayName
+              });
+
+              theUser.save((err) => {
+                  if (err) {
+                      done(err);
+                      return;
+                  }
+
+                  // if save is successful, log them in.
+                  done(null, theUser);
+              });
+          }
+        ); // close UserModel.findOne( ...
+    }
+  ) // close new FbStrategy( ...
+);
