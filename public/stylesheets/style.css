@@ -59,3 +59,12 @@ a {
   padding: 20px;
   width: 100%;
 }
+
+.success-message {
+  background: #009245;
+  box-sizing: border-box;
+  color: #fff;
+  margin: 20px auto;
+  padding: 20px;
+  width: 100%;
+}

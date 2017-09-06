@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const passport = require('passport');
 
 const UserModel = require('../models/user-model.js');
 
@@ -56,11 +57,32 @@ router.post('/process-signup', (req, res, next) => {
                   return;
               }
 
+              // set a flash message for feedback after the redirect
+              req.flash('signupSuccess', 'Sign up successful! Try logging in.');
+
               res.redirect('/');
           }); // close theUser.save((err) => { ...
       }
     ); // close UserModel.findOne( ...
 });  // close POST /process-signup
+
+
+router.get('/login', (req, res, next) => {
+    // check for feedback messages from the log in process
+    res.locals.flashError = req.flash('error');
+
+    res.render('auth-views/login-form.ejs');
+});
+
+router.post('/process-login',
+          // name of strategy   settings object
+          //               |     |
+  passport.authenticate('local', {
+      successRedirect: '/',
+      failureRedirect: '/login',
+      failureFlash: true
+  })
+);
 
 
 module.exports = router;

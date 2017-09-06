@@ -6,6 +6,13 @@ const cookieParser = require('cookie-parser');
 const bodyParser   = require('body-parser');
 const layouts      = require('express-ejs-layouts');
 const mongoose     = require('mongoose');
+const session      = require('express-session');
+const passport     = require('passport');
+const flash        = require('connect-flash');
+
+// Run all the setup code inside "passport-config.js"
+// (that file doesn't export anything)
+require('./config/passport-config.js');
 
 
 mongoose.connect('mongodb://localhost/express-users');
@@ -27,6 +34,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(layouts);
+app.use(session(
+  {
+    secret: 'this string needs to be different for every app',
+    resave: true,
+    saveUninitialized: true
+  }
+));
+// passport middlewares must come AFTER session middleware
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
 
 
 
