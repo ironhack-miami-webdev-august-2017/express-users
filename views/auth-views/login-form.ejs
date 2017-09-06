@@ -1,5 +1,11 @@
 <h2> Log In </h2>
 
+
+<% if (logoutFeedback.length > 0) { %>
+  <p class="success-message"> <%= logoutFeedback %> </p>
+<% } %>
+
+
 <form id="form" method="post" action="/process-login">
 
   <% if (flashError.length > 0) { %>

@@ -71,6 +71,9 @@ router.get('/login', (req, res, next) => {
     // check for feedback messages from the log in process
     res.locals.flashError = req.flash('error');
 
+    // check for feedback messages from the log out process
+    res.locals.logoutFeedback = req.flash('logoutSuccess');
+
     res.render('auth-views/login-form.ejs');
 });
 
@@ -83,6 +86,18 @@ router.post('/process-login',
       failureFlash: true
   })
 );
+
+
+router.get('/logout', (req, res, next) => {
+    // special passport method for clearing the session
+    // (emptying the bowl)
+    req.logout();
+
+    // set a flash message for feedback after the redirect
+    req.flash('logoutSuccess', 'Log out successful.');
+
+    res.redirect('/login');
+});
 
 
 module.exports = router;

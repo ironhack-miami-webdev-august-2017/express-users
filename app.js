@@ -46,6 +46,23 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
+// our own custom middleware for defining "currentUser" for our views
+app.use((req, res, next) => {
+    // if we are logged in, create the "currentUser" variable for views
+    if (req.user) {
+        res.locals.currentUser = req.user;
+    }
+
+    // otherwise, make "currentUser" blank
+    else {
+        res.locals.currentUser = null;
+    }
+
+    // call "next" to move on to the next step of the middleware pipeline
+    // (browser will hang forever unless you do this)
+    next();
+});
+
 
 
 // ROUTES GO HERE ---------------------------------------------------
