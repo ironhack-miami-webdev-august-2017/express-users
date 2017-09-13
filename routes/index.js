@@ -9,6 +9,8 @@ router.get('/', (req, res, next) => {
 
     // logged in
     if (req.user) {
+        res.locals.roomSuccess = req.flash('roomFeedback');
+
         res.render('user-home.ejs');
     }
 

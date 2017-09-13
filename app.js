@@ -73,6 +73,9 @@ app.use('/', index);
 const myAuthRoutes = require('./routes/auth-router.js');
 app.use(myAuthRoutes);
 
+const myRoomRoutes = require('./routes/room-router.js');
+app.use(myRoomRoutes);
+
 // END ROUTES -------------------------------------------------------
 
 

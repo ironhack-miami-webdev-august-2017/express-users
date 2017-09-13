@@ -9,6 +9,13 @@ const router = express.Router();
 
 
 router.get('/signup', (req, res, next) => {
+    // redirect to home if you are already logged in
+    // (and therefore already signed up)
+    if (req.user) {
+        res.redirect('/');
+        return;
+    }
+
     res.render('auth-views/signup-form.ejs');
 });
 
@@ -68,11 +75,19 @@ router.post('/process-signup', (req, res, next) => {
 
 
 router.get('/login', (req, res, next) => {
+    // redirect to home if you are already logged in
+    if (req.user) {
+        res.redirect('/');
+        return;
+    }
+
     // check for feedback messages from the log in process
     res.locals.flashError = req.flash('error');
 
     // check for feedback messages from the log out process
     res.locals.logoutFeedback = req.flash('logoutSuccess');
+
+    res.locals.securityFeedback = req.flash('securityError');
 
     res.render('auth-views/login-form.ejs');
 });
