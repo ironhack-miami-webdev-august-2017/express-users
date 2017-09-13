@@ -48,4 +48,32 @@ router.post('/rooms', (req, res, next) => {
 }); // close POST /rooms
 
 
+router.get('/my-rooms', (req, res, next) => {
+    // redirect to the log in page if NOT logged in
+    if (req.user === undefined) {
+        req.flash('securityError', 'Log in to see your rooms.');
+        res.redirect('/login');
+        return;
+    }
+
+    // find all the ROOMS whose owner is the logged in user
+    RoomModel.find(
+        // Logged in user's ID from passport
+        //           |
+      { owner: req.user._id },
+
+      (err, myRooms) => {
+          if (err) {
+              next(err);
+              return;
+          }
+
+          res.locals.listOfRooms = myRooms;
+
+          res.render('room-views/user-rooms.ejs');
+      }
+    ); // close RoomModel.find( ...
+}); // close GET /my-rooms
+
+
 module.exports = router;
