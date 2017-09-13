@@ -159,3 +159,56 @@ passport.use(
     }
   ) // close new FbStrategy( ...
 );
+
+
+
+const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+
+passport.use(
+  new GoogleStrategy(
+    {
+        clientID: 'google client id',
+        clientSecret: 'google client secret',
+        callbackURL: '/auth/google/callback'
+    },
+
+    (accessToken, refreshToken, profile, done) => {
+        console.log('Google user info:');
+        console.log( profile );
+
+        // check to see if it's the first time they log in
+        UserModel.findOne(
+          { googleID: profile.id },
+
+          (err, userFromDb) => {
+              if (err) {
+                  done(err);
+                  return;
+              }
+
+              // if there's already an account log them in
+              if (userFromDb) {
+                  done(null, userFromDb);
+                  return;
+              }
+
+              // otherwise create an account before logging them in
+              const theUser = new UserModel({
+                  googleID: profile.id,
+                  email: profile.emails[0].value
+              });
+
+              theUser.save((err) => {
+                  if (err) {
+                      done(err);
+                      return;
+                  }
+
+                  // log them in if save is successful
+                  done(null, theUser);
+              });
+          }
+        ); // close UserModel.findOne( ...
+    }
+  ) // close new GoogleStrategy( ...
+);

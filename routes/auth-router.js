@@ -114,4 +114,25 @@ router.get('/auth/facebook/callback',
 );
 
 
+
+// link to "/auth/google" to take the user to the Google Website for login
+router.get('/auth/google',
+  passport.authenticate('google', {
+      scope: [
+          'https://www.googleapis.com/auth/plus.login',
+          'https://www.googleapis.com/auth/plus.profile.emails.read'
+      ]
+  })
+);
+// the "/auth/google/callback" URL is where the user will arrive after login
+router.get('/auth/google/callback',
+  passport.authenticate('google', {
+      successRedirect: '/',
+      failureRedirect: '/login',
+      failureFlash: true
+  })
+);
+
+
+
 module.exports = router;
