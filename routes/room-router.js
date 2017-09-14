@@ -1,9 +1,17 @@
 const express = require('express');
+const multer = require('multer');
 
 const RoomModel = require('../models/room-model.js');
 
 
 const router = express.Router();
+
+const myUploader = multer(
+  // 1 argument -> a settings object
+  {
+      dest: __dirname + '/../public/uploads/'
+  } //  |
+);  // destination (where to put uploaded files)
 
 
 router.get('/rooms/new', (req, res, next) => {
@@ -18,34 +26,46 @@ router.get('/rooms/new', (req, res, next) => {
 });
 
 // <form method="post" action="/rooms">
-router.post('/rooms', (req, res, next) => {
-    // redirect to the log in page if NOT logged in
-    if (req.user === undefined) {
-        req.flash('securityError', 'Log in to add a room.');
-        res.redirect('/login');
-        return;
-    }
+router.post('/rooms',
 
-    const theRoom = new RoomModel({
-        name: req.body.roomName,
-        photoUrl: req.body.roomPhoto,
-        desc: req.body.roomDesc,
-        owner: req.user._id
-    }); //           |
-        // Logged in user's ID from passport
-        // (passport defines "req.user")
+  myUploader.single('roomPhoto'),
+     //                  |
+     // <input name="roomPhoto" type="file">
 
-    theRoom.save((err) => {
-        if (err) {
-            next(err);
-            return;
-        }
+  (req, res, next) => {
+      // redirect to the log in page if NOT logged in
+      if (req.user === undefined) {
+          req.flash('securityError', 'Log in to add a room.');
+          res.redirect('/login');
+          return;
+      }
 
-        req.flash('roomFeedback', 'Room added.');
+      // multer creates "req.file" with all the uploaded file information
+      console.log('req.file (created by multer) --------------');
+      console.log( req.file );
 
-        res.redirect('/');
-    });
-}); // close POST /rooms
+      const theRoom = new RoomModel({
+          name: req.body.roomName,
+          photoUrl: '/uploads/' + req.file.filename,
+                                    // "req.file.filename" is the automatically
+          desc: req.body.roomDesc,  // generated name for the uploaded file
+          owner: req.user._id
+      }); //           |
+          // Logged in user's ID from passport
+          // (passport defines "req.user")
+
+      theRoom.save((err) => {
+          if (err) {
+              next(err);
+              return;
+          }
+
+          req.flash('roomFeedback', 'Room added.');
+
+          res.redirect('/');
+      });
+  }
+); // close POST /rooms
 
 
 router.get('/my-rooms', (req, res, next) => {
