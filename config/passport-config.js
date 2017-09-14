@@ -109,11 +109,12 @@ const FbStrategy = require('passport-facebook').Strategy;
 passport.use(
   new FbStrategy(
     // 1st arg -> settings object
+    // "fb_app_id" & "fb_app_secret" are defined in the ".env" file
     {
         // clientID = App ID
-        clientID: 'facebook app id',
+        clientID: process.env.fb_app_id,
         // clientSecret = App Secret
-        clientSecret: 'facebook app secret',
+        clientSecret: process.env.fb_app_secret,
         callbackURL: '/auth/facebook/callback'
     },
 
@@ -166,9 +167,10 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 passport.use(
   new GoogleStrategy(
+    // "google_client_id" & "google_client_secret" are defined in the ".env" file
     {
-        clientID: 'google client id',
-        clientSecret: 'google client secret',
+        clientID: process.env.google_client_id,
+        clientSecret: process.env.google_client_secret,
         callbackURL: '/auth/google/callback'
     },
 
