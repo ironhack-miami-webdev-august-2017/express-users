@@ -171,7 +171,8 @@ passport.use(
     {
         clientID: process.env.google_client_id,
         clientSecret: process.env.google_client_secret,
-        callbackURL: '/auth/google/callback'
+        callbackURL: '/auth/google/callback',
+        proxy: true  // fixes Google log in for production
     },
 
     (accessToken, refreshToken, profile, done) => {
