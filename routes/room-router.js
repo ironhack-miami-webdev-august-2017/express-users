@@ -129,47 +129,60 @@ router.get('/rooms/:roomId/edit', (req, res, next) => {
     ); // close RoomModel.findById( ...
 }); // close GET /rooms/:roomId/edit
 
-router.post('/rooms/:roomId', (req, res, next) => {
-    // redirect to the log in page if NOT logged in
-    if (req.user === undefined) {
-        req.flash('securityError', 'Log in to edit your rooms.');
-        res.redirect('/login');
-        return;
-    }
+router.post('/rooms/:roomId',
 
-    RoomModel.findById(
-      req.params.roomId,
+  myUploader.single('roomPhoto'),
+     //                  |
+     // <input name="roomPhoto" type="file">
 
-      (err, roomFromDb) => {
-          if (err) {
-              next(err);
-              return;
-          }
-
-          // redirect if you don't own this room
-          if (roomFromDb.owner.toString() !== req.user._id.toString()) {
-              req.flash('securityError', 'You can only edit your rooms.');
-              res.redirect('/my-rooms');
-              return;
-          }
-
-          roomFromDb.name = req.body.roomName;
-          roomFromDb.photoUrl = req.body.roomPhoto;
-          roomFromDb.desc = req.body.roomDesc;
-
-          roomFromDb.save((err) => {
-              if (err) {
-                  next(err);
-                  return;
-              }
-
-              req.flash('updateSuccess', 'Room update successful.');
-
-              res.redirect('/my-rooms');
-          }); // close roomFromDb.save((err) => { ...
+  (req, res, next) => {
+      // redirect to the log in page if NOT logged in
+      if (req.user === undefined) {
+          req.flash('securityError', 'Log in to edit your rooms.');
+          res.redirect('/login');
+          return;
       }
-    ); // close RoomModel.findById( ...
-}); // close POST /rooms/:roomId
+
+      RoomModel.findById(
+        req.params.roomId,
+
+        (err, roomFromDb) => {
+            if (err) {
+                next(err);
+                return;
+            }
+
+            // redirect if you don't own this room
+            if (roomFromDb.owner.toString() !== req.user._id.toString()) {
+                req.flash('securityError', 'You can only edit your rooms.');
+                res.redirect('/my-rooms');
+                return;
+            }
+
+            roomFromDb.name = req.body.roomName;
+            roomFromDb.desc = req.body.roomDesc;
+
+            // "req.file" will be undefined if the user doesn't upload anything
+
+            // update "photoUrl" only if the user uploaded a file
+            if (req.file) {
+                roomFromDb.photoUrl = '/uploads/' + req.file.filename;
+            }
+
+            roomFromDb.save((err) => {
+                if (err) {
+                    next(err);
+                    return;
+                }
+
+                req.flash('updateSuccess', 'Room update successful.');
+
+                res.redirect('/my-rooms');
+            }); // close roomFromDb.save((err) => { ...
+        }
+      ); // close RoomModel.findById( ...
+  }
+); // close POST /rooms/:roomId
 
 
 
